@@ -138,4 +138,4 @@ app.listen(PORT, HOST, () => {
 });
 // apt update
 // apt install -y jq
-// redis-cli GET all_entries | jq
+// redis6-cli -h test-redis.konkas.tech -p 6379 --tls --insecure GET all_entries | jq

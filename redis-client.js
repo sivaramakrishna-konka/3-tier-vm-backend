@@ -17,4 +17,21 @@ redis.on('error', (err) => {
   console.error('Redis connection error:', err);
 });
 
+redis.set('test_key', 'Hello from Redis', (err, result) => {
+  if (err) {
+    console.error('Error writing to Redis:', err);
+  } else {
+    console.log('Successfully wrote to Redis:', result);
+  }
+});
+
+// Get data from Redis
+redis.get('test_key', (err, result) => {
+  if (err) {
+    console.error('Error reading from Redis:', err);
+  } else {
+    console.log('Successfully read from Redis:', result);
+  }
+});
+
 module.exports = redis;
