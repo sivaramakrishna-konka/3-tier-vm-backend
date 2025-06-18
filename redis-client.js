@@ -9,6 +9,9 @@ const redis = new Redis({
   }
 });
 
+// When you're testing container redis container by default not using TLS
+// If you are using a local Redis instance without TLS, you can comment out the tls option
+
 redis.on('connect', () => {
   console.log('Connected to Redis');
 });
