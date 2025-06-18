@@ -19,29 +19,44 @@ app.use(bodyParser.json());
 //   allowedHeaders: ['Content-Type', 'Authorization']
 // }));
 // console.log('CORS Allowed Origin:', ALLOWED_ORIGIN);
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN; // e.g., https://frontend.konkas.tech
+
+const cors = require('cors');
+
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN; // Optional
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) {
-      // 🟢 No Origin header → NGINX proxy or same-origin request
-      callback(null, true);
-    } else if (origin === ALLOWED_ORIGIN) {
-      // 🟢 Matches the exact allowed frontend
-      callback(null, true);
-    } else {
-      // 🔴 All others denied
-      callback(new Error(`CORS Error: ${origin} not allowed`));
+    // 🔓 Allow everything if ALLOWED_ORIGIN is not defined (e.g., Docker/dev mode)
+    if (!ALLOWED_ORIGIN) {
+      return callback(null, true);
     }
+
+    // 🟢 Allow same-origin or internal calls (no origin header)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // ✅ Allow only if origin matches explicitly
+    if (origin === ALLOWED_ORIGIN) {
+      return callback(null, true);
+    }
+
+    // 🔴 Otherwise, block
+    return callback(new Error(`CORS Error: ${origin} not allowed`));
   },
-  // credentials: true,
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  // credentials: true, // Uncomment if you need cookie-based auth
 };
 
 app.use(cors(corsOptions));
 
-console.log('✅ CORS Configured for:', ALLOWED_ORIGIN);
+console.log(
+  ALLOWED_ORIGIN
+    ? `✅ CORS enabled for: ${ALLOWED_ORIGIN}`
+    : '🔓 CORS is open (no ALLOWED_ORIGIN set)'
+);
+
 
 
 // Preflight
