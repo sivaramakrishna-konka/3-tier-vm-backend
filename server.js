@@ -126,13 +126,37 @@ const HOST = process.env.HOST || '0.0.0.0';
 app.use(bodyParser.json());
 
 // CORS Configuration
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
-app.use(cors({
-  origin: ALLOWED_ORIGIN,
+// const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+// app.use(cors({
+//   origin: ALLOWED_ORIGIN,
+//   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+// console.log('CORS Allowed Origin:', ALLOWED_ORIGIN);
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN; // e.g., https://frontend.konkas.tech
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) {
+      // 🟢 No Origin header → NGINX proxy or same-origin request
+      callback(null, true);
+    } else if (origin === ALLOWED_ORIGIN) {
+      // 🟢 Matches the exact allowed frontend
+      callback(null, true);
+    } else {
+      // 🔴 All others denied
+      callback(new Error(`CORS Error: ${origin} not allowed`));
+    }
+  },
+  // credentials: true,
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
-console.log('CORS Allowed Origin:', ALLOWED_ORIGIN);
+};
+
+app.use(cors(corsOptions));
+
+console.log('✅ CORS Configured for:', ALLOWED_ORIGIN);
+
 
 // Preflight
 app.options('/api/entries', cors());
