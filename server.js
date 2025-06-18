@@ -20,8 +20,6 @@ app.use(bodyParser.json());
 // }));
 // console.log('CORS Allowed Origin:', ALLOWED_ORIGIN);
 
-const cors = require('cors');
-
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN; // Optional
 
 const corsOptions = {
